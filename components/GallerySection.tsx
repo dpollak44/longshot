@@ -157,9 +157,10 @@ export default function GallerySection() {
   return (
     <section className="container px-4 md:px-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Coffee Gallery</h2>
+        <p className="font-cursive text-2xl text-gray-600 mb-2">Explore</p>
+        <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">Coffee Culture</h2>
         <p className="text-gray-600 max-w-2xl mx-auto mb-6">
-          Explore our world of coffee through moments, methods, and memories
+          Behind every cup is a story of passion, craft, and community
         </p>
         
         <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -183,7 +184,7 @@ export default function GallerySection() {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`break-inside-avoid-column mb-4 ${item.height} relative group overflow-hidden rounded-lg transition-transform hover:scale-[1.02]`}
+            className={`break-inside-avoid-column mb-4 ${item.height} relative group overflow-hidden transition-transform hover:scale-[1.02]`}
           >
             {item.type === "image" && (
               <div className="relative h-full bg-gray-200">

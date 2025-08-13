@@ -71,11 +71,11 @@ const Header = () => {
             </button>
             
             <Link href="/" className="flex items-center ml-4 md:ml-0">
-              <span className="text-xl md:text-2xl font-bold tracking-tight">
+              <span className="font-serif text-xl md:text-2xl font-bold tracking-tight">
                 LONGSHOT
               </span>
-              <span className="ml-2 text-xs md:text-sm font-light tracking-widest">
-                COFFEE CO.
+              <span className="font-cursive ml-2 text-sm md:text-base tracking-wide">
+                Coffee Co.
               </span>
             </Link>
           </div>

@@ -7,7 +7,13 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+        cursive: ['var(--font-dancing)', 'cursive'],
+      },
+    },
   },
   plugins: [],
 };

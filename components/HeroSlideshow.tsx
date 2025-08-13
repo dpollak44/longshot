@@ -68,7 +68,7 @@ const HeroSlideshow = () => {
   };
 
   return (
-    <div className="relative h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+    <div className="relative h-[480px] md:h-[560px] lg:h-[640px] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -91,10 +91,10 @@ const HeroSlideshow = () => {
             )}
             <div className="relative h-full flex items-center justify-center px-4">
               <div className="container text-center max-w-4xl">
-                <h1 className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in leading-tight ${slide.bgImage ? 'text-white drop-shadow-lg' : 'text-black'}`}>
+                <h1 className={`font-serif text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in leading-tight ${slide.bgImage ? 'text-white drop-shadow-lg' : 'text-black'}`}>
                   {slide.title}
                 </h1>
-                <p className={`text-xl md:text-2xl mb-10 max-w-2xl mx-auto ${slide.bgImage ? 'text-gray-100 drop-shadow' : 'text-gray-700'}`}>
+                <p className={`font-cursive text-2xl md:text-3xl mb-10 max-w-2xl mx-auto ${slide.bgImage ? 'text-gray-100 drop-shadow' : 'text-gray-700'}`}>
                   {slide.subtitle}
                 </p>
                 <Link
