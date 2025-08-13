@@ -3,8 +3,8 @@ import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react"
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-white mt-20">
-      <div className="container py-12">
+    <footer className="bg-black text-white mt-32">
+      <div className="container py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-lg font-bold mb-4">LONGSHOT COFFEE</h3>
@@ -110,7 +110,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8">
+        <div className="border-t border-gray-800 mt-12 pt-12">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400 mb-4 md:mb-0">
               © 2024 Longshot Coffee Company. All rights reserved.

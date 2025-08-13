@@ -4,13 +4,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const slides = [
+interface Slide {
+  id: number;
+  title: string;
+  subtitle: string;
+  cta: string;
+  ctaLink: string;
+  bgImage?: string;
+  bgColor: string;
+}
+
+const slides: Slide[] = [
   {
     id: 1,
     title: "New Arrival: Ethiopia Yirgacheffe",
     subtitle: "Bright, floral notes with hints of lemon",
     cta: "Shop Now",
     ctaLink: "/shop/single-origin",
+    bgImage: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1920&h=800&fit=crop",
     bgColor: "bg-gradient-to-br from-yellow-50 to-yellow-100",
   },
   {
@@ -19,6 +30,7 @@ const slides = [
     subtitle: "Never run out of your favorite coffee",
     cta: "Start Subscription",
     ctaLink: "/subscribe",
+    bgImage: "https://images.unsplash.com/photo-1497515114628-676f0090d8b7?w=1920&h=800&fit=crop",
     bgColor: "bg-gradient-to-br from-gray-100 to-gray-200",
   },
   {
@@ -27,6 +39,7 @@ const slides = [
     subtitle: "Premium coffee for your business",
     cta: "Learn More",
     ctaLink: "/wholesale",
+    bgImage: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1920&h=800&fit=crop",
     bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
   },
 ];
@@ -55,7 +68,7 @@ const HeroSlideshow = () => {
   };
 
   return (
-    <div className="relative h-[500px] md:h-[600px] overflow-hidden">
+    <div className="relative h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -63,20 +76,38 @@ const HeroSlideshow = () => {
             index === currentSlide ? "translate-x-0" : index < currentSlide ? "-translate-x-full" : "translate-x-full"
           }`}
         >
-          <div className={`h-full ${slide.bgColor} flex items-center justify-center`}>
-            <div className="container text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
-                {slide.title}
-              </h1>
-              <p className="text-lg md:text-xl mb-8 text-gray-700">
-                {slide.subtitle}
-              </p>
-              <Link
-                href={slide.ctaLink}
-                className="inline-block bg-black text-white px-8 py-3 font-medium hover:bg-gray-800 transition-colors"
-              >
-                {slide.cta}
-              </Link>
+          <div className="h-full relative">
+            {slide.bgImage ? (
+              <>
+                <img
+                  src={slide.bgImage}
+                  alt={slide.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40" />
+              </>
+            ) : (
+              <div className={`absolute inset-0 ${slide.bgColor}`} />
+            )}
+            <div className="relative h-full flex items-center justify-center px-4">
+              <div className="container text-center max-w-4xl">
+                <h1 className={`text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in leading-tight ${slide.bgImage ? 'text-white drop-shadow-lg' : 'text-black'}`}>
+                  {slide.title}
+                </h1>
+                <p className={`text-xl md:text-2xl mb-10 max-w-2xl mx-auto ${slide.bgImage ? 'text-gray-100 drop-shadow' : 'text-gray-700'}`}>
+                  {slide.subtitle}
+                </p>
+                <Link
+                  href={slide.ctaLink}
+                  className={`inline-block px-10 py-4 text-lg font-medium transition-all transform hover:scale-105 ${
+                    slide.bgImage 
+                      ? 'bg-white text-black hover:bg-gray-100 shadow-xl' 
+                      : 'bg-black text-white hover:bg-gray-800'
+                  }`}
+                >
+                  {slide.cta}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

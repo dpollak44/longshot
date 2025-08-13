@@ -1,5 +1,6 @@
 import HeroSlideshow from "@/components/HeroSlideshow";
 import ProductCard from "@/components/ProductCard";
+import GallerySection from "@/components/GallerySection";
 import Link from "next/link";
 import { ArrowRight, Package, Truck, Award, Coffee } from "lucide-react";
 
@@ -40,19 +41,19 @@ const featuredCoffees = [
 
 export default function Home() {
   return (
-    <>
+    <div className="space-y-24 md:space-y-32">
       <HeroSlideshow />
       
-      <section className="container py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">This Week&apos;s Featured Coffees</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+      <section className="container px-4 md:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">This Week&apos;s Featured Coffees</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover our carefully curated selection of exceptional coffees from around the world.
             Each bag tells a story of origin, craftsmanship, and flavor.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {featuredCoffees.map((coffee) => (
             <ProductCard key={coffee.id} {...coffee} />
           ))}
@@ -69,46 +70,50 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-16">
+      <div className="py-12 md:py-16">
+        <GallerySection />
+      </div>
+
+      <section className="bg-gray-50 py-24 md:py-32">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose Longshot?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Coffee className="text-black" size={32} />
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">Why Choose Longshot?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div className="text-center p-4">
+              <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <Coffee className="text-black" size={36} />
               </div>
-              <h3 className="font-semibold mb-2">Expertly Roasted</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-lg mb-3">Expertly Roasted</h3>
+              <p className="text-gray-600">
                 Small-batch roasted to perfection to bring out each coffee&apos;s unique characteristics
               </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="text-black" size={32} />
+            <div className="text-center p-4">
+              <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <Award className="text-black" size={36} />
               </div>
-              <h3 className="font-semibold mb-2">Ethically Sourced</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-lg mb-3">Ethically Sourced</h3>
+              <p className="text-gray-600">
                 Direct trade relationships ensuring fair prices for farmers and exceptional quality
               </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="text-black" size={32} />
+            <div className="text-center p-4">
+              <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <Package className="text-black" size={36} />
               </div>
-              <h3 className="font-semibold mb-2">Freshness Guaranteed</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-lg mb-3">Freshness Guaranteed</h3>
+              <p className="text-gray-600">
                 Roasted to order and shipped within 24 hours for maximum freshness
               </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Truck className="text-black" size={32} />
+            <div className="text-center p-4">
+              <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <Truck className="text-black" size={36} />
               </div>
-              <h3 className="font-semibold mb-2">Free Shipping</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-lg mb-3">Free Shipping</h3>
+              <p className="text-gray-600">
                 Free shipping on orders over $40. Subscribe and save an additional 15%
               </p>
             </div>
@@ -116,10 +121,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container py-16">
-        <div className="bg-black text-white p-8 md:p-12 rounded-lg">
+      <section className="container px-4 md:px-8">
+        <div className="bg-black text-white p-12 md:p-20 rounded-lg shadow-2xl">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Never Run Out of Great Coffee
             </h2>
             <p className="text-lg mb-8 text-gray-300">
@@ -144,11 +149,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-16">
-        <div className="container">
+      <section className="bg-gray-50 py-24 md:py-32">
+        <div className="container px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-4">Exceptional Coffee, Curious People</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">Exceptional Coffee, Curious People</h2>
               <p className="text-gray-600 mb-6">
                 At Longshot Coffee Company, we believe that great coffee brings people together. 
                 Our journey began with a simple mission: to source the world&apos;s finest coffees 
@@ -177,10 +182,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container py-16">
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-8 md:p-12 rounded-lg">
+      <section className="container px-4 md:px-8 pb-12 md:pb-16">
+        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-12 md:p-20 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Wholesale Partners</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Wholesale Partners</h2>
             <p className="text-lg mb-8 text-gray-700">
               Serve exceptional coffee at your cafe, restaurant, or office. 
               We offer competitive pricing, training, and equipment support.
@@ -194,6 +199,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
