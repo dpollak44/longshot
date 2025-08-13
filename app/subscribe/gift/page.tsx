@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Gift, Calendar, Coffee, ArrowRight } from "lucide-react";
+import { Gift, Coffee, ArrowRight } from "lucide-react";
 
 export default function GiftSubscriptionPage() {
   const [selectedDuration, setSelectedDuration] = useState("3months");

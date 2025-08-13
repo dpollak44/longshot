@@ -4,7 +4,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Minus, ShoppingCart } from "lucide-react";
 
-const coffeeProducts: Record<string, any> = {
+interface CoffeeProduct {
+  id: string;
+  name: string;
+  origin: string;
+  price: number;
+  notes: string[];
+  roastLevel: string;
+  description: string;
+  altitude: string;
+  process: string;
+  variety: string;
+  harvest: string;
+}
+
+const coffeeProducts: Record<string, CoffeeProduct> = {
   "ethiopia-yirgacheffe": {
     id: "ethiopia-yirgacheffe",
     name: "Ethiopia Yirgacheffe",
@@ -33,12 +47,22 @@ const coffeeProducts: Record<string, any> = {
   },
 };
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  return <ProductPageWrapper params={params} />;
+}
+
+async function ProductPageWrapper({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  
+  return <ProductPageClient productId={resolvedParams.id} />;
+}
+
+function ProductPageClient({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1);
   const [grind, setGrind] = useState("whole");
   const [size, setSize] = useState("12oz");
   
-  const product = coffeeProducts[params.id] || coffeeProducts["ethiopia-yirgacheffe"];
+  const product = coffeeProducts[productId] || coffeeProducts["ethiopia-yirgacheffe"];
 
   const incrementQuantity = () => setQuantity(q => q + 1);
   const decrementQuantity = () => setQuantity(q => Math.max(1, q - 1));
@@ -70,7 +94,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <p className="text-xl text-gray-600 mb-4">{product.origin}</p>
           
           <div className="flex gap-2 mb-4">
-            {product.notes.map((note: string, index: number) => (
+            {product.notes.map((note, index) => (
               <span key={index} className="px-3 py-1 bg-gray-100 text-sm rounded">
                 {note}
               </span>

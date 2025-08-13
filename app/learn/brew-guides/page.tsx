@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Clock, Droplets, Thermometer, Coffee } from "lucide-react";
 
 const brewMethods = [
