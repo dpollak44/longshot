@@ -1,4 +1,4 @@
-import HeroSlideshow from "@/components/HeroSlideshow";
+import HeroSlideshow from "@/components/HeroSlideshowContentful";
 import GallerySection from "@/components/GallerySection";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -22,7 +22,7 @@ export default async function Home() {
   ]);
 
   // Transform Contentful data for components
-  const slidesData = heroSlides.map(slide => ({
+  const slidesData = heroSlides.map((slide: any) => ({
     id: slide.sys.id,
     title: slide.fields.title,
     subtitle: slide.fields.subtitle,
@@ -34,7 +34,7 @@ export default async function Home() {
     bgColor: slide.fields.backgroundColor || 'bg-gradient-to-br from-gray-100 to-gray-200',
   }));
 
-  const productsData = featuredProducts.map(product => ({
+  const productsData = featuredProducts.map((product: any) => ({
     id: product.fields.slug,
     name: product.fields.name,
     origin: product.fields.origin,
@@ -46,7 +46,7 @@ export default async function Home() {
       : undefined
   }));
 
-  const galleryData = galleryItems.map(item => {
+  const galleryData = galleryItems.map((item: any) => {
     const baseItem = {
       id: item.sys.id,
       type: item.fields.type,

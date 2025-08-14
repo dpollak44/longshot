@@ -1,115 +1,21 @@
-import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
+import { getProducts, getCollections } from "@/lib/shopify";
+import ProductCard from "@/components/ProductCard";
 
-const allCoffees = [
-  {
-    id: "ethiopia-yirgacheffe",
-    name: "Ethiopia Yirgacheffe",
-    origin: "Yirgacheffe, Ethiopia",
-    price: 24.00,
-    notes: ["Floral", "Lemon", "Bergamot"],
-    roastLevel: "light" as const,
-  },
-  {
-    id: "colombia-geisha",
-    name: "Colombia Geisha",
-    origin: "Huila, Colombia",
-    price: 32.00,
-    notes: ["Jasmine", "Peach", "Honey"],
-    roastLevel: "light" as const,
-  },
-  {
-    id: "kenya-aa",
-    name: "Kenya AA",
-    origin: "Nyeri, Kenya",
-    price: 26.00,
-    notes: ["Blackcurrant", "Wine", "Tomato"],
-    roastLevel: "light" as const,
-  },
-  {
-    id: "guatemala-antigua",
-    name: "Guatemala Antigua",
-    origin: "Antigua, Guatemala",
-    price: 22.00,
-    notes: ["Chocolate", "Spice", "Orange"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "costa-rica-tarrazu",
-    name: "Costa Rica Tarrazú",
-    origin: "Tarrazú, Costa Rica",
-    price: 23.00,
-    notes: ["Citrus", "Chocolate", "Honey"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "peru-organic",
-    name: "Peru Organic",
-    origin: "Cajamarca, Peru",
-    price: 21.00,
-    notes: ["Caramel", "Nuts", "Mild"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "house-blend",
-    name: "Longshot House Blend",
-    origin: "Central & South America",
-    price: 18.00,
-    notes: ["Chocolate", "Caramel", "Nuts"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "breakfast-blend",
-    name: "Morning Glory Blend",
-    origin: "Various",
-    price: 16.00,
-    notes: ["Balanced", "Smooth", "Nutty"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "espresso-blend",
-    name: "Espresso Perfetto",
-    origin: "Brazil & Colombia",
-    price: 19.00,
-    notes: ["Rich", "Syrupy", "Cocoa"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "espresso-dark",
-    name: "Midnight Espresso",
-    origin: "Brazil & Indonesia",
-    price: 20.00,
-    notes: ["Dark Chocolate", "Molasses", "Smoke"],
-    roastLevel: "dark" as const,
-  },
-  {
-    id: "french-roast",
-    name: "French Roast",
-    origin: "Central America",
-    price: 18.00,
-    notes: ["Bold", "Smoky", "Bittersweet"],
-    roastLevel: "dark" as const,
-  },
-  {
-    id: "decaf-colombia",
-    name: "Decaf Colombia",
-    origin: "Colombia",
-    price: 20.00,
-    notes: ["Caramel", "Citrus", "Smooth"],
-    roastLevel: "medium" as const,
-  },
-];
+export default async function AllCoffeePage() {
+  const [products, collections] = await Promise.all([
+    getProducts({ first: 50 }),
+    getCollections()
+  ]);
 
-const categories = [
-  { name: "All Coffee", href: "/shop/all", active: true },
-  { name: "Single Origin", href: "/shop/single-origin" },
-  { name: "Blends", href: "/shop/blends" },
-  { name: "Decaf", href: "/shop/decaf" },
-  { name: "Equipment", href: "/shop/equipment" },
-  { name: "Merchandise", href: "/shop/merchandise" },
-];
-
-export default function AllCoffeePage() {
+  const categories = [
+    { name: "All Coffee", href: "/shop/all", active: true },
+    ...collections.map((col: any) => ({
+      name: col.title,
+      href: `/shop/collection/${col.handle}`,
+      active: false
+    }))
+  ];
   return (
     <div className="container py-8">
       <div className="mb-8">
@@ -136,13 +42,23 @@ export default function AllCoffeePage() {
       </div>
 
       <div className="flex justify-between items-center mb-6">
-        <p className="text-sm text-gray-600">{allCoffees.length} products</p>
+        <p className="text-sm text-gray-600">{products.length} products</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {allCoffees.map((coffee) => (
-          <ProductCard key={coffee.id} {...coffee} />
-        ))}
+        {products.map((product: any) => {
+          const coffee = {
+            id: product.handle,
+            name: product.title,
+            origin: product.tags.find((tag: string) => tag.includes(',')) || 'Various Origins',
+            price: parseFloat(product.priceRange.minVariantPrice.amount),
+            notes: product.tags.filter((tag: string) => !tag.includes('-') && !tag.includes(',')).slice(0, 3),
+            roastLevel: product.tags.includes('light-roast') ? 'light' as const : 
+                        product.tags.includes('dark-roast') ? 'dark' as const : 'medium' as const,
+            imageUrl: product.images?.edges?.[0]?.node?.url || product.featuredImage?.url || undefined
+          };
+          return <ProductCard key={coffee.id} {...coffee} />;
+        })}
       </div>
     </div>
   );

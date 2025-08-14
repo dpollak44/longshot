@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, ShoppingCart, User, Search, ChevronDown } from "lucide-react";
+import { useCart } from "@/components/CartProvider";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
+  const { getTotalItems } = useCart();
 
   const navigation = [
     {
@@ -137,9 +139,11 @@ const Header = () => {
             </Link>
             <Link href="/cart" className="p-2 hover:bg-gray-100 rounded-full transition-colors relative">
               <ShoppingCart size={20} />
-              <span className="absolute -top-1 -right-1 bg-accent text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                0
-              </span>
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
             </Link>
           </div>
         </div>

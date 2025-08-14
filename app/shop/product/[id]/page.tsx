@@ -1,76 +1,67 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Minus, ShoppingCart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { getProductByHandle } from "@/lib/shopify";
+import ProductDetails from "@/components/ProductDetails";
 
-interface CoffeeProduct {
-  id: string;
-  name: string;
-  origin: string;
-  price: number;
-  notes: string[];
-  roastLevel: string;
-  description: string;
-  altitude: string;
-  process: string;
-  variety: string;
-  harvest: string;
-}
-
-const coffeeProducts: Record<string, CoffeeProduct> = {
-  "ethiopia-yirgacheffe": {
-    id: "ethiopia-yirgacheffe",
-    name: "Ethiopia Yirgacheffe",
-    origin: "Yirgacheffe, Ethiopia",
-    price: 24.00,
-    notes: ["Floral", "Lemon", "Bergamot"],
-    roastLevel: "light",
-    description: "This exceptional coffee from the birthplace of arabica showcases bright, wine-like acidity with delicate floral notes. Grown at 1,700-2,200 meters above sea level, these beans are washed processed to highlight their natural complexity.",
-    altitude: "1,700-2,200 masl",
-    process: "Washed",
-    variety: "Heirloom",
-    harvest: "October - December",
-  },
-  "colombia-geisha": {
-    id: "colombia-geisha",
-    name: "Colombia Geisha",
-    origin: "Huila, Colombia",
-    price: 32.00,
-    notes: ["Jasmine", "Peach", "Honey"],
-    roastLevel: "light",
-    description: "A rare and exotic variety from the mountains of Huila. This Geisha displays extraordinary clarity and complexity with jasmine florals and stone fruit sweetness.",
-    altitude: "1,800-2,000 masl",
-    process: "Washed",
-    variety: "Geisha",
-    harvest: "May - July",
-  },
-};
-
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  return <ProductPageWrapper params={params} />;
-}
-
-async function ProductPageWrapper({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
+export default async function ProductPage({ 
+  params,
+  searchParams 
+}: { 
+  params: Promise<{ id: string }>,
+  searchParams: Promise<{ subscribe?: string }>
+}) {
+  // Await params
+  const { id } = await params;
+  const { subscribe } = await searchParams;
   
-  return <ProductPageClient productId={resolvedParams.id} />;
-}
-
-function ProductPageClient({ productId }: { productId: string }) {
-  const [quantity, setQuantity] = useState(1);
-  const [grind, setGrind] = useState("whole");
-  const [size, setSize] = useState("12oz");
+  // Fetch product from Shopify
+  const product = await getProductByHandle(id);
   
-  const product = coffeeProducts[productId] || coffeeProducts["ethiopia-yirgacheffe"];
+  if (!product) {
+    return (
+      <div className="container py-8">
+        <Link href="/shop/all" className="inline-flex items-center gap-2 text-gray-600 hover:text-black mb-6">
+          <ArrowLeft size={20} />
+          Back to Shop
+        </Link>
+        <div className="text-center py-20">
+          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <p className="text-gray-600 mb-8">Sorry, we couldn&apos;t find that product.</p>
+          <Link href="/shop/all" className="bg-black text-white px-6 py-3 inline-block hover:bg-gray-800">
+            Browse All Coffee
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
-  const incrementQuantity = () => setQuantity(q => q + 1);
-  const decrementQuantity = () => setQuantity(q => Math.max(1, q - 1));
+  // Create subscription options based on variant titles
+  const subscriptionOptions = product.variants?.edges
+    ?.filter((v: { node: { title: string } }) => v.node.title !== 'One-time')
+    ?.map((v: { node: { id: string; title: string; price: { amount: string } } }) => {
+      const discount = v.node.title === 'Weekly' ? 20 : 15;
+      return {
+        id: v.node.id,
+        name: `Deliver every ${v.node.title.toLowerCase().replace('-', ' ')} • Save ${discount}%`,
+        variantId: v.node.id,
+        price: v.node.price.amount,
+        discount,
+        frequency: v.node.title
+      };
+    }) || [];
+    
+  const hasSubscriptions = subscriptionOptions.length > 0;
 
-  const calculatePrice = () => {
-    const sizeMultiplier = size === "5lb" ? 4 : 1;
-    return (product.price * quantity * sizeMultiplier).toFixed(2);
-  };
+  // Parse product details
+  const roastLevel = product.tags.includes('light-roast') ? 'light' : 
+                    product.tags.includes('dark-roast') ? 'dark' : 'medium';
+  
+  const notes = product.tags
+    .filter((tag: string) => !tag.includes('-') && !tag.includes(',') && tag.length < 20)
+    .slice(0, 3);
+
+  const origin = product.tags.find((tag: string) => tag.includes(',')) || 
+                product.vendor || 'Various Origins';
 
   return (
     <div className="container py-8">
@@ -80,111 +71,112 @@ function ProductPageClient({ productId }: { productId: string }) {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Product Images */}
         <div>
-          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-8xl mb-4">☕</div>
-              <p className="text-gray-500">Product Image</p>
+          {product.featuredImage ? (
+            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img
+                src={product.featuredImage.url}
+                alt={product.title}
+                className="w-full h-full object-cover"
+              />
             </div>
-          </div>
+          ) : product.images?.edges?.length > 0 ? (
+            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img
+                src={product.images.edges[0].node.url}
+                alt={product.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-8xl mb-4">☕</div>
+                <p className="text-gray-500">Product Image</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Additional images thumbnails */}
+          {product.images?.edges?.length > 1 && (
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              {product.images.edges.slice(0, 4).map((img: { node: { url: string; altText: string | null } }, index: number) => (
+                <div key={index} className="aspect-square bg-gray-100 rounded overflow-hidden">
+                  <img
+                    src={img.node.url}
+                    alt={`${product.title} ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-          <p className="text-xl text-gray-600 mb-4">{product.origin}</p>
-          
-          <div className="flex gap-2 mb-4">
-            {product.notes.map((note, index) => (
-              <span key={index} className="px-3 py-1 bg-gray-100 text-sm rounded">
-                {note}
-              </span>
-            ))}
+        {/* Product Info - Client Component */}
+        <ProductDetails 
+          product={product}
+          roastLevel={roastLevel}
+          notes={notes}
+          origin={origin}
+          subscriptionOptions={subscriptionOptions}
+          showSubscribe={subscribe === 'true'}
+        />
+      </div>
+
+      {/* Product Details Section */}
+      <div className="mt-16 border-t pt-12">
+        <h2 className="font-serif text-2xl font-bold mb-6">Coffee Details</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div>
+            <p className="text-sm text-gray-600 mb-1">Roast Level:</p>
+            <p className="font-medium capitalize">{roastLevel}</p>
           </div>
-
-          <p className="text-2xl font-semibold mb-6">${calculatePrice()}</p>
-
-          <p className="text-gray-700 mb-6">{product.description}</p>
-
-          <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">Size</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSize("12oz")}
-                  className={`px-4 py-2 border ${size === "12oz" ? "border-black bg-black text-white" : "border-gray-300"}`}
-                >
-                  12oz
-                </button>
-                <button
-                  onClick={() => setSize("5lb")}
-                  className={`px-4 py-2 border ${size === "5lb" ? "border-black bg-black text-white" : "border-gray-300"}`}
-                >
-                  5lb (Save 15%)
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Grind</label>
-              <select 
-                value={grind} 
-                onChange={(e) => setGrind(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300"
-              >
-                <option value="whole">Whole Bean</option>
-                <option value="drip">Drip</option>
-                <option value="espresso">Espresso</option>
-                <option value="french-press">French Press</option>
-                <option value="pour-over">Pour Over</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Quantity</label>
-              <div className="flex items-center gap-4">
-                <button onClick={decrementQuantity} className="p-2 border border-gray-300 hover:bg-gray-100">
-                  <Minus size={20} />
-                </button>
-                <span className="text-lg font-medium w-12 text-center">{quantity}</span>
-                <button onClick={incrementQuantity} className="p-2 border border-gray-300 hover:bg-gray-100">
-                  <Plus size={20} />
-                </button>
-              </div>
-            </div>
+          <div>
+            <p className="text-sm text-gray-600 mb-1">Origin:</p>
+            <p className="font-medium">{origin}</p>
           </div>
-
-          <button className="w-full bg-black text-white py-3 font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-            <ShoppingCart size={20} />
-            Add to Cart
-          </button>
-
-          <div className="mt-8 pt-8 border-t">
-            <h3 className="font-semibold mb-4">Coffee Details</h3>
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-gray-600">Roast Level:</dt>
-                <dd className="font-medium capitalize">{product.roastLevel}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600">Altitude:</dt>
-                <dd className="font-medium">{product.altitude}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600">Process:</dt>
-                <dd className="font-medium">{product.process}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600">Variety:</dt>
-                <dd className="font-medium">{product.variety}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600">Harvest:</dt>
-                <dd className="font-medium">{product.harvest}</dd>
-              </div>
-            </dl>
+          <div>
+            <p className="text-sm text-gray-600 mb-1">Process:</p>
+            <p className="font-medium">Washed</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 mb-1">Harvest:</p>
+            <p className="font-medium">Seasonal</p>
           </div>
         </div>
       </div>
+
+      {/* Subscription Benefits */}
+      {hasSubscriptions && (
+        <div className="mt-12 bg-gradient-to-br from-accent/20 to-yellow-50 p-8 rounded-lg">
+          <h3 className="font-serif text-2xl font-bold mb-4">Subscribe & Save</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">☕</span>
+              <div>
+                <p className="font-semibold">Save up to 20%</p>
+                <p className="text-sm text-gray-600">On every order</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🚚</span>
+              <div>
+                <p className="font-semibold">Free Shipping</p>
+                <p className="text-sm text-gray-600">Always included</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">⏸️</span>
+              <div>
+                <p className="font-semibold">Flexible</p>
+                <p className="text-sm text-gray-600">Pause or cancel anytime</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

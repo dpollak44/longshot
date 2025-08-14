@@ -2,43 +2,22 @@ import HeroSlideshow from "@/components/HeroSlideshow";
 import GallerySection from "@/components/GallerySection";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getProducts } from "@/lib/shopify";
 
-const featuredCoffees = [
-  {
-    id: "ethiopia-yirgacheffe",
-    name: "Ethiopia Yirgacheffe",
-    origin: "Yirgacheffe, Ethiopia",
-    price: 24.00,
-    notes: ["Floral", "Lemon", "Bergamot"],
-    roastLevel: "light" as const,
-  },
-  {
-    id: "colombia-geisha",
-    name: "Colombia Geisha",
-    origin: "Huila, Colombia",
-    price: 32.00,
-    notes: ["Jasmine", "Peach", "Honey"],
-    roastLevel: "light" as const,
-  },
-  {
-    id: "house-blend",
-    name: "Longshot House Blend",
-    origin: "Central & South America",
-    price: 18.00,
-    notes: ["Chocolate", "Caramel", "Nuts"],
-    roastLevel: "medium" as const,
-  },
-  {
-    id: "espresso-dark",
-    name: "Midnight Espresso",
-    origin: "Brazil & Indonesia",
-    price: 20.00,
-    notes: ["Dark Chocolate", "Molasses", "Smoke"],
-    roastLevel: "dark" as const,
-  },
-];
-
-export default function Home() {
+export default async function Home() {
+  // Fetch featured products from Shopify
+  const products = await getProducts({ first: 4 });
+  
+  const featuredCoffees = products.map((product: any) => ({
+    id: product.handle,
+    name: product.title,
+    origin: product.tags.find((tag: string) => tag.includes(',')) || 'Various Origins',
+    price: parseFloat(product.priceRange.minVariantPrice.amount),
+    notes: product.tags.filter((tag: string) => !tag.includes('-') && !tag.includes(',')).slice(0, 3),
+    roastLevel: product.tags.includes('light-roast') ? 'light' as const : 
+                product.tags.includes('dark-roast') ? 'dark' as const : 'medium' as const,
+    image: product.images?.edges?.[0]?.node?.url || product.featuredImage?.url || null
+  }));
   return (
     <div>
       <HeroSlideshow />
@@ -84,7 +63,7 @@ export default function Home() {
             {/* Right side - Product Grid */}
             <div className="lg:col-span-8">
               <div className="grid grid-cols-2 gap-4 md:gap-6">
-                {featuredCoffees.slice(0, 4).map((coffee, index) => (
+                {featuredCoffees.map((coffee: any, index: number) => (
                   <Link 
                     key={coffee.id} 
                     href={`/shop/product/${coffee.id}`}
@@ -92,12 +71,7 @@ export default function Home() {
                   >
                     <div className={`aspect-square bg-gray-100 relative ${index === 0 || index === 3 ? 'row-span-1' : ''}`}>
                       <img
-                        src={`https://images.unsplash.com/photo-${[
-                          '1611854779393-1b2da9d400fe',
-                          '1559056199-5a47f60c5053', 
-                          '1514432324607-a09d9b4aefdd',
-                          '1507133750040-4a8f57021571'
-                        ][index]}?w=600&h=600&fit=crop`}
+                        src={coffee.image || `https://images.unsplash.com/photo-1497515114629-f71d768fd07c?w=600&h=600&fit=crop`}
                         alt={coffee.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
